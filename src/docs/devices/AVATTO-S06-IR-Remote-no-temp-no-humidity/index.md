@@ -16,6 +16,25 @@ board: esp8266
 | GPIO5  | Remote Receiver    |
 | GPIO13 | Reset Button       |
 
+## Sensor temperature and humedad
+sensor:
+  - platform: aht10
+  temperature:
+    name: "Temperatura"
+    filters:
+    - offset: 0
+    id: temp22
+  humidity:
+    name: "Humedad"
+  address: 0x38
+  update_interval: 5s
+
+## GPIO Pinout humidity and temperature sensor
+i2c:
+  sda: GPIO1
+  scl: GPIO3
+  scan: true
+
 ## Getting it up and running
 
 This device needs very likely to be flashed manually. Tuya-convert didn't worked for me. I have powered the device with
@@ -86,6 +105,24 @@ ota:
 # https://esphome.io/components/status_led.html
 status_led:
   pin: 4
+i2c:
+  sda: GPIO1
+  scl: GPIO3
+  scan: true
+# LED  With this configuration the led appears and can be turned off and on   
+
+output:
+  - platform: esp8266_pwm
+    id: esphome_ir1_led
+    pin:
+      number: GPIO4
+      inverted: false
+      
+light:
+  - platform: monochromatic
+    name: "Blue LED"
+    output: esphome_ir1_led
+    id: light_led
 
 # https://esphome.io/components/remote_receiver.html
 remote_receiver:
@@ -108,7 +145,21 @@ climate:
     name: AC'
     receiver_id: rcvr
     transmitter_id: tamtr
+    # Sensor temperature
+    sensor: temp22
 
+# Built-in aht10 temperature and humidity sensor
+sensor:
+  - platform: aht10
+  temperature:
+    name: "Temperatura"
+    filters:
+    - offset: 0
+    id: temp22
+  humidity:
+    name: "Humedad"
+  address: 0x38
+  update_interval: 5s
 switch:
   - platform: template
     name: 'AC Preset'
